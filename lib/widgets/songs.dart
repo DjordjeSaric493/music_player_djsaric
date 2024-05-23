@@ -11,7 +11,30 @@ class Songs extends StatefulWidget {
 }
 
 class _SongsState extends State<Songs> {
-  final _myAudioQuery = new OnAudioQuery();
+  bool _hasPermission = false;
+  final OnAudioQuery _audioQuery = OnAudioQuery();
+
+  @override
+  void initState() {
+    super.initState();
+
+    LogConfig logConfig = LogConfig(logType: LogType.DEBUG);
+    _audioQuery.setLogConfig(logConfig);
+
+    // Check and request for permission.
+    checkAndRequestPermissions();
+  }
+
+  checkAndRequestPermissions({bool retry = false}) async {
+    // The param 'retryRequest' is false, by default.
+    _hasPermission = await _audioQuery.checkAndRequest(
+      retryRequest: retry,
+    );
+
+    // Only call update the UI if application has all required permissions.
+    _hasPermission ? setState(() {}) : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     //f-ing front end 💀
@@ -29,7 +52,7 @@ class _SongsState extends State<Songs> {
       //here i want to make list of songs,
       //i dunno how much songs i have in device
       body: FutureBuilder<List<SongModel>>(
-        future: _myAudioQuery.querySongs(
+        future: _audioQuery.querySongs(
           sortType: null,
           orderType: OrderType.ASC_OR_SMALLER,
           uriType: UriType.EXTERNAL, //external storagem to read from device mem
@@ -37,7 +60,7 @@ class _SongsState extends State<Songs> {
         ),
         builder: (context, item) {
           if (item.data == null) {
-            return Center(
+            return const Center(
               child: LinearProgressIndicator(
                 color: Colors.blueAccent,
                 borderRadius: BorderRadius.horizontal(
