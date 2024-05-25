@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/songs.dart';
+import 'screenz/songs.dart';
 
 void main() {
   runApp(const MainApp());
