@@ -1,38 +1,55 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class PlayingNow extends StatefulWidget {
-  const PlayingNow({super.key, required this.songModel});
+  const PlayingNow(
+      {super.key, required this.songModel, required this.audioPlayer});
   final SongModel songModel;
+  final AudioPlayer audioPlayer;
 
   @override
   State<PlayingNow> createState() => _PlayingNowState();
 }
 
 class _PlayingNowState extends State<PlayingNow> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-
+  Duration _duration = const Duration();
+  Duration _position = const Duration();
   bool isPlayin = false;
+
   @override
   void initState() {
     super.initState();
     playSong();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
   }
 
   //f-tion 4 playing songs
   void playSong() {
     try {
-      _audioPlayer
+      widget.audioPlayer
           .setAudioSource(AudioSource.uri(Uri.parse(widget.songModel.uri!)));
-      _audioPlayer.play();
+      widget.audioPlayer.play();
       isPlayin = true;
     } catch (e) {
       //secure in case that data is corrupted
       print("cant parse song");
     }
+    widget.audioPlayer.durationStream.listen((event) {
+      setState(() {
+        _duration = event!;
+      });
+    });
+    widget.audioPlayer.positionStream.listen((event) {
+      setState(() {
+        _position = event; //rcvr cant be null so dont need to use !
+      });
+    });
   }
 
   @override
@@ -58,13 +75,20 @@ class _PlayingNowState extends State<PlayingNow> {
             Center(
               child: Column(
                 children: [
-                  const CircleAvatar(
-                    radius: 100.0,
-                    child: Icon(
-                      Icons.music_note_rounded,
-                      size: 80.0,
-                    ),
-                  ),
+                  CircleAvatar(
+                      radius: 100.0,
+                      child: QueryArtworkWidget(
+                        id: widget.songModel.id,
+                        type: ArtworkType.AUDIO,
+                        artworkHeight: 200,
+                        artworkWidth: 200,
+                        artworkFit: BoxFit.cover,
+                        nullArtworkWidget: const Icon(
+                          Icons.music_note_rounded,
+                          color: Colors.blueAccent,
+                          size: 200,
+                        ),
+                      )),
                   SizedBox(
                     height: 30.0,
                   ),
@@ -93,10 +117,28 @@ class _PlayingNowState extends State<PlayingNow> {
                     height: 10.0,
                   ),
                   Row(
+                    //duration  how song is long in format hour:min:sec
+                    //position current playing time
                     children: [
-                      Text("0.0"),
+                      Text(_position.toString().split(".")[0]),
                       Expanded(
-                          child: Slider(value: 0.0, onChanged: (value) {})),
+                        child: Slider(
+                          min: const Duration(milliseconds: 0)
+                              .inSeconds
+                              .toDouble(),
+                          value: _position.inSeconds
+                              .toDouble(), //value accepts double
+                          max: _duration.inSeconds.toDouble(),
+                          onChanged: (value) {
+                            setState(() {
+                              change2seconds(value.toInt());
+                              value = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Text(_duration.toString().split(".")[0])
+                      //duration is in milisecs, figured out how to displ mins and secs
                     ],
                   ),
                   Row(
@@ -116,9 +158,9 @@ class _PlayingNowState extends State<PlayingNow> {
                             //bool value is false so if val is false pause else play
                             if (isPlayin) {
                               //better way to type condition, won't type isPlayin=true, this is not uni project lol
-                              _audioPlayer.pause();
+                              widget.audioPlayer.pause();
                             } else {
-                              _audioPlayer.play();
+                              widget.audioPlayer.play();
                             }
                             isPlayin = !isPlayin;
                           });
@@ -146,5 +188,10 @@ class _PlayingNowState extends State<PlayingNow> {
         ),
       )),
     );
+  }
+
+  void change2seconds(int seconds) {
+    Duration duration = Duration(seconds: seconds);
+    widget.audioPlayer.seek(duration);
   }
 }

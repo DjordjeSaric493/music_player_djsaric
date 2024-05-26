@@ -104,8 +104,14 @@ class _SongsState extends State<Songs> {
                   itemCount: item.data!.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      leading: const Icon(Icons.music_note_sharp,
-                          color: Colors.blueAccent),
+                      leading: QueryArtworkWidget(
+                        id: item.data![index].id,
+                        type: ArtworkType.AUDIO,
+                        nullArtworkWidget: const Icon(
+                          Icons.music_note_outlined,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
                       title: Text(item
                           .data![index].displayNameWOExt), //return song name
                       subtitle: Text(
@@ -116,8 +122,10 @@ class _SongsState extends State<Songs> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  PlayingNow(songModel: item.data![index]),
+                              builder: (context) => PlayingNow(
+                                songModel: item.data![index],
+                                audioPlayer: _audioPlayer,
+                              ),
                             ));
                       },
                     );
