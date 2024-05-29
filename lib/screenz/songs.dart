@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_player_djsaric/screenz/playing_now.dart';
+import 'package:music_player_djsaric/state-provider/song_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
 
 //note check out audioquery package: https://pub.dev/packages/on_audio_query
 //refer on documentation for messing up with androidmanifest.xml and ios info.plist
@@ -19,6 +21,7 @@ class _SongsState extends State<Songs> {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   //this function accepts uri
+
   playSong(String? uri) {
     //Sets the source from which this audio player should fetch audio
     try {
@@ -100,10 +103,13 @@ class _SongsState extends State<Songs> {
                     child: Text("No songs found"),
                   );
                 }
+                //ubacim gesture detection?
                 return ListView.builder(
                   itemCount: item.data!.length,
                   itemBuilder: (context, index) {
                     return ListTile(
+                      key: ValueKey(item.data![index].id),
+
                       leading: QueryArtworkWidget(
                         id: item.data![index].id,
                         type: ArtworkType.AUDIO,
@@ -119,6 +125,9 @@ class _SongsState extends State<Songs> {
                       trailing: const Icon(Icons.more_horiz_sharp,
                           color: Colors.blueAccent),
                       onTap: () {
+                        context
+                            .read<SongProvider>()
+                            .setId(item.data![index].id);
                         Navigator.push(
                             context,
                             MaterialPageRoute(

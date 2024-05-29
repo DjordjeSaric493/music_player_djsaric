@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:music_player_djsaric/screenz/widgets/artwork_widget.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class PlayingNow extends StatefulWidget {
@@ -18,7 +20,7 @@ class PlayingNow extends StatefulWidget {
 class _PlayingNowState extends State<PlayingNow> {
   Duration _duration = const Duration();
   Duration _position = const Duration();
-  bool isPlayin = false;
+  bool isPlaying = false;
 
   @override
   void initState() {
@@ -33,9 +35,17 @@ class _PlayingNowState extends State<PlayingNow> {
   void playSong() {
     try {
       widget.audioPlayer
-          .setAudioSource(AudioSource.uri(Uri.parse(widget.songModel.uri!)));
+          .setAudioSource(AudioSource.uri(Uri.parse(widget.songModel.uri!),
+              tag: MediaItem(
+                // Specify a unique ID for each media item:
+                id: '${widget.songModel.id}',
+                // Metadata to display in the notification:
+                album: '${widget.songModel.album}',
+                title: '${widget.songModel.displayNameWOExt}',
+                artUri: Uri.parse('https://example.com/albumart.jpg'),
+              )));
       widget.audioPlayer.play();
-      isPlayin = true;
+      isPlaying = true;
     } catch (e) {
       //secure in case that data is corrupted
       print("cant parse song");
@@ -55,9 +65,9 @@ class _PlayingNowState extends State<PlayingNow> {
   @override
   //design
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-          child: Container(
+    double height = MediaQuery.sizeOf(context).height;
+    return SafeArea(
+      child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -75,22 +85,9 @@ class _PlayingNowState extends State<PlayingNow> {
             Center(
               child: Column(
                 children: [
-                  CircleAvatar(
-                      radius: 100.0,
-                      child: QueryArtworkWidget(
-                        id: widget.songModel.id,
-                        type: ArtworkType.AUDIO,
-                        artworkHeight: 200,
-                        artworkWidth: 200,
-                        artworkFit: BoxFit.cover,
-                        nullArtworkWidget: const Icon(
-                          Icons.music_note_rounded,
-                          color: Colors.blueAccent,
-                          size: 200,
-                        ),
-                      )),
-                  SizedBox(
-                    height: 30.0,
+                  CircleAvatar(radius: 100.0, child: ArtworkWidget()),
+                  const SizedBox(
+                    height: 20.0,
                   ),
                   Text(
                     widget.songModel.displayNameWOExt, //see supachat app
@@ -145,8 +142,12 @@ class _PlayingNowState extends State<PlayingNow> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       IconButton(
-                        onPressed: () {},
-                        icon: Icon(
+                        onPressed: () {
+                          if (widget.audioPlayer.hasPrevious) {
+                            widget.audioPlayer.seekToPrevious();
+                          }
+                        },
+                        icon: const Icon(
                           Icons.skip_previous_rounded,
                           size: 40,
                         ),
@@ -156,25 +157,29 @@ class _PlayingNowState extends State<PlayingNow> {
                         onPressed: () {
                           setState(() {
                             //bool value is false so if val is false pause else play
-                            if (isPlayin) {
+                            if (isPlaying) {
                               //better way to type condition, won't type isPlayin=true, this is not uni project lol
                               widget.audioPlayer.pause();
                             } else {
                               widget.audioPlayer.play();
                             }
-                            isPlayin = !isPlayin;
+                            isPlaying = !isPlaying;
                           });
                         },
                         icon: Icon(
-                          isPlayin ? Icons.pause : Icons.play_arrow,
+                          isPlaying ? Icons.pause : Icons.play_arrow,
                           size: 40,
                           color: Colors.red,
                         ),
                       ),
                       IconButton(
                         //skip button logik
-                        onPressed: () {},
-                        icon: Icon(
+                        onPressed: () {
+                          if (widget.audioPlayer.hasNext) {
+                            widget.audioPlayer.seekToNext();
+                          }
+                        },
+                        icon: const Icon(
                           Icons.skip_next_rounded,
                           size: 40,
                         ),
@@ -186,7 +191,7 @@ class _PlayingNowState extends State<PlayingNow> {
             )
           ],
         ),
-      )),
+      ),
     );
   }
 

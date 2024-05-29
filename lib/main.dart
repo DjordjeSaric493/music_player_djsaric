@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:music_player_djsaric/state-provider/song_provider.dart';
+import 'package:provider/provider.dart';
 import 'screenz/songs.dart';
 
-void main() {
-  runApp(const MainApp());
+Future<void> main() async {
+  //r
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
+  runApp(ChangeNotifierProvider(
+      create: (context) => SongProvider(), child: const MainApp()));
 }
 
 class MainApp extends StatelessWidget {
