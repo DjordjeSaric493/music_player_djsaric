@@ -67,7 +67,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                 title: Text(song.title),
                 subtitle: Text(song.artist ?? 'Unknown Artist'),
                 onTap: () {
-                  // Handle song tap, e.g., play the song
+                  // TODO: Djordje odradi da pebaci na playing now screen
                 },
               );
             },
