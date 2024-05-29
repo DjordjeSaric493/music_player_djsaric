@@ -42,7 +42,7 @@ class _PlayingNowState extends State<PlayingNow> {
                 // Metadata to display in the notification:
                 album: '${widget.songModel.album}',
                 title: '${widget.songModel.displayNameWOExt}',
-                artUri: Uri.parse('https://example.com/albumart.jpg'),
+                artUri: Uri.parse(widget.songModel.id.toString()),
               )));
       widget.audioPlayer.play();
       isPlaying = true;
@@ -66,6 +66,7 @@ class _PlayingNowState extends State<PlayingNow> {
   //design
   Widget build(BuildContext context) {
     double height = MediaQuery.sizeOf(context).height;
+    //bolje kao grid za responsivity
     return SafeArea(
       child: Container(
         width: double.infinity,
