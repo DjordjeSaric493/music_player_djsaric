@@ -77,3 +77,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
     );
   }
 }
+/*
+TODO: ideja- za onaj widget koji pušta pesmu, statemngmt, stack jer ide preko listwidgeta izvali kako...
+
+*/
