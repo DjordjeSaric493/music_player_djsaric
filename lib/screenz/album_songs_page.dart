@@ -44,7 +44,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
     return Scaffold(
       appBar: AppBar(
         //TODO:
-        title: Text('ADD HERE TEXT DO DISPLAY ALBUM NAME '),
+        title: Text(widget.albumId.toString()),
       ),
       body: FutureBuilder<List<SongModel>>(
         future: _songsFuture,

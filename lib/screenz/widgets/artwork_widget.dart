@@ -14,7 +14,7 @@ class ArtworkWidget extends StatelessWidget {
       artworkHeight: 200,
       artworkWidth: 200,
       artworkFit: BoxFit.cover,
-      nullArtworkWidget: const Icon(
+      nullArtworkWidget: Icon(
         Icons.music_note_rounded,
         color: Colors.blueAccent,
         size: 200,
