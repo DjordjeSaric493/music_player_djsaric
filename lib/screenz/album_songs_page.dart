@@ -1,11 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:music_player_djsaric/screenz/playing_now.dart';
+import 'package:music_player_djsaric/state-provider/song_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
 
 class AlbumSongsPage extends StatefulWidget {
   final int albumId;
-  const AlbumSongsPage({super.key, required this.albumId});
+  final String album;
+  const AlbumSongsPage({super.key, required this.albumId, required this.album});
 
   @override
   State<AlbumSongsPage> createState() => _AlbumSongsPageState();
@@ -44,7 +48,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
     return Scaffold(
       appBar: AppBar(
         //TODO:
-        title: Text(widget.albumId.toString()),
+        title: Text(widget.album.toString()),
       ),
       body: FutureBuilder<List<SongModel>>(
         future: _songsFuture,
@@ -67,7 +71,16 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                 title: Text(song.title),
                 subtitle: Text(song.artist ?? 'Unknown Artist'),
                 onTap: () {
-                  // TODO: Djordje odradi da pebaci na playing now screen
+                  // it's playing a song from album
+                  context.read<SongProvider>().setId(snapshot.data![index].id);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PlayingNow(
+                          songModel: snapshot.data![index],
+                          audioPlayer: _audioPlayer,
+                        ),
+                      ));
                 },
               );
             },
@@ -79,5 +92,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
 }
 /*
 TODO: ideja- za onaj widget koji pušta pesmu, statemngmt, stack jer ide preko listwidgeta izvali kako...
-
 */
+
+//TODO: da bi puštao prethodnu/sledeću pesmu mora da se ponaša kao plejlista određenog albuma za muziku!
+

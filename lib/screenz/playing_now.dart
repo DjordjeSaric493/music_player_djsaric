@@ -72,7 +72,7 @@ class _PlayingNowState extends State<PlayingNow> {
       });
     });
 
-    context.read<SongProvider>().id = widget.songModel.id;
+    context.read<SongProvider>().id = widget.songModel.id; //get a proper id
   }
 
   @override
@@ -99,9 +99,7 @@ class _PlayingNowState extends State<PlayingNow> {
           ],
           children: [
             IconButton(
-              onPressed: () {
-                widget.audioPlayer.seekToPrevious();
-              },
+              onPressed: () {},
               icon: const Icon(Icons.arrow_back_outlined),
             ).inGridArea('back'),
             Center(
@@ -153,6 +151,7 @@ class _PlayingNowState extends State<PlayingNow> {
               children: [
                 IconButton(
                   onPressed: () {
+                    //TODO:NEXT I PREVIOUS ME ZAJEBAVA NEĆE DA RADI -> VRV SLIČNO KAO SA PLAY TREBA
                     if (widget.audioPlayer.hasPrevious) {
                       widget.audioPlayer.seekToPrevious();
                     }
@@ -165,6 +164,7 @@ class _PlayingNowState extends State<PlayingNow> {
                 IconButton(
                   onPressed: () {
                     setState(() {
+                      //PLAY RADI
                       if (isPlaying) {
                         widget.audioPlayer.pause();
                       } else {
