@@ -11,7 +11,3 @@ class SongProvider with ChangeNotifier {
     id = _id;
   }
 }
-
-/*
-detailed explanation: 
-*/

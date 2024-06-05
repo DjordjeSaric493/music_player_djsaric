@@ -26,7 +26,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
     super.initState();
 
     _songsFuture = _fetchSongs();
-    //hold the future result of the songs that will be fetched from the specified album.
+    //Hold the future result of the songs that will be fetched from the specified album.
   }
 
   Future<List<SongModel>> _fetchSongs() async {
@@ -47,7 +47,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //TODO:
+        //TODO: STAVI STREAM!!!!
         title: Text(widget.album.toString()),
       ),
       body: FutureBuilder<List<SongModel>>(
@@ -71,7 +71,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                 title: Text(song.title),
                 subtitle: Text(song.artist ?? 'Unknown Artist'),
                 onTap: () {
-                  // it's playing a song from album
+                  // It's playing a song from particular album
                   context.read<SongProvider>().setId(snapshot.data![index].id);
                   Navigator.push(
                       context,
@@ -79,6 +79,7 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                         builder: (context) => PlayingNow(
                           songModel: snapshot.data![index],
                           audioPlayer: _audioPlayer,
+                          songList: [],
                         ),
                       ));
                 },
@@ -90,9 +91,3 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
     );
   }
 }
-/*
-TODO: ideja- za onaj widget koji pušta pesmu, statemngmt, stack jer ide preko listwidgeta izvali kako...
-*/
-
-//TODO: da bi puštao prethodnu/sledeću pesmu mora da se ponaša kao plejlista određenog albuma za muziku!
-

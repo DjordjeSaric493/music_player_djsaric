@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'screenz/songs.dart';
 
 Future<void> main() async {
-  //r
+  //background music player
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',

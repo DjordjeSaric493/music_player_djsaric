@@ -1,35 +1,11 @@
-/*import 'package:flutter/material.dart';
-import 'package:music_player_djsaric/state-provider/song_provider.dart';
-import 'package:on_audio_query/on_audio_query.dart';
-import 'package:provider/provider.dart';
-
-class ArtworkWidget extends StatelessWidget {
-  const ArtworkWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return QueryArtworkWidget(
-      id: context.watch<SongProvider>().id,
-      type: ArtworkType.AUDIO,
-      artworkHeight: 200,
-      artworkWidth: 200,
-      artworkFit: BoxFit.cover,
-      nullArtworkWidget: Icon(
-        Icons.music_note_rounded,
-        color: Colors.blueAccent,
-        size: 200,
-      ),
-    );
-  }
-}
-*/
 import 'package:flutter/material.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 import 'package:music_player_djsaric/state-provider/song_provider.dart';
 
 class ArtworkWidget extends StatefulWidget {
-  const ArtworkWidget({super.key});
+  final int songId;
+  const ArtworkWidget({super.key, required this.songId});
 
   @override
   _ArtworkWidgetState createState() => _ArtworkWidgetState();
@@ -45,6 +21,7 @@ class _ArtworkWidgetState extends State<ArtworkWidget> {
     currentSongId = context.watch<SongProvider>().id;
     artworkFuture = fetchArtwork(currentSongId);
   }
+  //32-45 U BUILD METHOD, FWTCH ARTWORK DA VRAĆA SAMO ARTWORK
 
   Future<Widget> fetchArtwork(int songId) async {
     final artwork = await OnAudioQuery().queryArtwork(

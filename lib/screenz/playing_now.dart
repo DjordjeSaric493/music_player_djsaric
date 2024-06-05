@@ -12,11 +12,16 @@ import 'package:music_player_djsaric/state-provider/song_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
+//TODO: RENAME SVE U US !!!!!!!!!!!!!!!!1
 class PlayingNow extends StatefulWidget {
   const PlayingNow(
-      {super.key, required this.songModel, required this.audioPlayer});
+      {super.key,
+      required this.songModel,
+      required this.audioPlayer,
+      required this.songList});
   final SongModel songModel;
   final AudioPlayer audioPlayer;
+  final List<SongModel> songList; //accept list of songs from album
 
   @override
   State<PlayingNow> createState() => _PlayingNowState();
@@ -61,6 +66,30 @@ class _PlayingNowState extends State<PlayingNow> {
       print("cant parse song");
     }
 
+    /* 
+   void playSong() async {
+    try {
+      final audioSource = ConcatenatingAudioSource(
+        children: widget.songList.map((song) {
+          return AudioSource.uri(
+            Uri.parse(song.uri!),
+            tag: MediaItem(
+              id: '${song.id}',
+              album: '${song.album}',
+              title: '${song.displayNameWOExt}',
+              artUri: Uri.parse(song.id.toString()),
+            ),
+          );
+        }).toList(),
+      );
+
+      await widget.audioPlayer.setAudioSource(audioSource);
+      widget.audioPlayer.play();
+      isPlaying = true;
+    } catch (e) {
+      print("Can't parse song: $e");
+    }*/
+
     widget.audioPlayer.durationStream.listen((event) {
       setState(() {
         _duration = event!;
@@ -81,14 +110,14 @@ class _PlayingNowState extends State<PlayingNow> {
       body: SafeArea(
         child: LayoutGrid(
           areas: '''
-            back back back
-            image image image
-            name name name
-            artist artist artist
-            position position position
-            controls controls controls
+            back 
+            image 
+            name 
+            artist 
+            position 
+            controls 
           ''',
-          columnSizes: [1.fr, 1.fr, 1.fr],
+          columnSizes: [1.fr],
           rowSizes: const [
             auto,
             auto,
@@ -105,7 +134,11 @@ class _PlayingNowState extends State<PlayingNow> {
             Center(
               child: CircleAvatar(
                 radius: 100.0,
-                child: ArtworkWidget(key: ValueKey(widget.songModel.id)),
+                //obtain artwork for song
+                child: ArtworkWidget(
+                  key: ValueKey(widget.songModel.id),
+                  songId: widget.songModel.id,
+                ),
               ),
             ).inGridArea('image'),
             Center(

@@ -1,24 +1,50 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music_player_djsaric/screenz/album_songs_page.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
-//stf bcuz it can be changed, gonna incorporate more manipulation like delete album when i learn how
-//TODO:STREAMBUILDER fetchuj na par minuta
+//Stateful widget, showing albums (using streams for updating UI)
 class AlbumsPage extends StatefulWidget {
-  const AlbumsPage({super.key});
+  AlbumsPage({super.key});
 
   @override
   State<AlbumsPage> createState() => _AlbumsPageState();
 }
 
 class _AlbumsPageState extends State<AlbumsPage> {
+  final StreamController<List<AlbumModel>> _albumsStreamController =
+      StreamController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> fetchALbums() async {
+    try {
+      await OnAudioQuery().permissionsRequest();
+
+      //Fetch album data here
+      List<AlbumModel> albums = await OnAudioQuery().queryAlbums();
+      _albumsStreamController.add(albums);
+    } catch (e) {
+      print('$e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _albumsStreamController.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<AlbumModel>>(
-        future: OnAudioQuery()
-            .queryAlbums(), //TODO: Zatraži permisije i ovde, kao u album songs
+      body: StreamBuilder<List<AlbumModel>>(
+        stream: _albumsStreamController.stream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -27,8 +53,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No albums found here '));
           }
-          List<AlbumModel> albums =
-              snapshot.data!; //it' s almost like supachat messing with streams
+          List<AlbumModel> albums = snapshot.data!;
 
           return ListView.builder(
             itemCount: albums.length,
@@ -61,4 +86,3 @@ class _AlbumsPageState extends State<AlbumsPage> {
     );
   }
 }
-//TODO: UČITAVA SA SD NA PAR MINUTA KAO DA FETCH-UJE, KORISTIM STREAMBUILD U TOM SLUČAJU

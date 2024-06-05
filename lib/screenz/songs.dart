@@ -8,8 +8,8 @@ import 'package:music_player_djsaric/state-provider/song_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
-//note check out audioquery package: https://pub.dev/packages/on_audio_query
-//refer on documentation for messing up with androidmanifest.xml and ios info.plist
+//Note  audioquery package: https://pub.dev/packages/on_audio_query
+//Refer on documentation for  androidmanifest.xml and ios info.plist
 class Songs extends StatefulWidget {
   const Songs({super.key});
 
@@ -70,11 +70,12 @@ class _SongsState extends State<Songs> {
         print("Can't find directory");
       }
     } catch (e) {
-      print("$e"); //idk y it requires logging, maybe  popup would do job
+      print("$e");
     }
   }
 
-  void scanDirectory(Directory directory) {
+  /* void scanDirectory(Directory directory) {
+    //TODO: DA VRAĆA LISTE PESAMA
     try {
       //this
       List<FileSystemEntity> entities = directory.listSync(recursive: true);
@@ -100,6 +101,33 @@ class _SongsState extends State<Songs> {
       }
     } catch (e) {
       print('$e');
+    }
+  }*/
+  //try to return list of songs
+
+  Future<List<SongModel>> scanDirectory(Directory directory) async {
+    List<SongModel> newSongs = [];
+    try {
+      List<FileSystemEntity> entities = directory.listSync(recursive: true);
+      for (FileSystemEntity entity in entities) {
+        if (entity is File) {
+          //check if it's a music file, see bool isMusicFIle
+          if (_isMusicFile(entity.path)) {
+            //now query the song details using audioQuery
+            List<SongModel> songs = await _audioQuery.querySongs(
+              path: entity.path,
+              uriType: UriType.EXTERNAL,
+            );
+            if (songs.isNotEmpty) {
+              newSongs.addAll(songs);
+            }
+          }
+        }
+      }
+      return newSongs;
+    } catch (e) {
+      print('$e');
+      return [];
     }
   }
 
@@ -141,7 +169,7 @@ class _SongsState extends State<Songs> {
 
   @override
   Widget build(BuildContext context) {
-    // f-ing front end 💀
+    //front end 💀
     return Scaffold(
       appBar: AppBar(
         title: const Text("MusicPlayer by Dj. Sarić "),
@@ -154,7 +182,7 @@ class _SongsState extends State<Songs> {
         ],
       ),
       // here I want to make list of songs,
-      // I dunno how much songs I have in device
+      // I don't how much songs I have in device
       body: StreamBuilder<List<SongModel>>(
         stream: _songsController.stream,
         builder: (context, snapshot) {
@@ -169,12 +197,12 @@ class _SongsState extends State<Songs> {
             );
           }
           if (snapshot.data!.isEmpty) {
-            // TODO: zameni sa nečim lepšim kasnije
+            // TODO: add no songs page
             return const Center(
               child: Text("No songs found"),
             );
           }
-          // ubacim gesture detection?
+          //
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
@@ -202,6 +230,7 @@ class _SongsState extends State<Songs> {
                         builder: (context) => PlayingNow(
                           songModel: snapshot.data![index],
                           audioPlayer: _audioPlayer,
+                          songList: [],
                         ),
                       ));
                 },
