@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:music_player_djsaric/screenz/playing_now.dart';
+import 'package:music_player_djsaric/screens/playing_now.dart';
 import 'package:music_player_djsaric/state-provider/song_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';

@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:music_player_djsaric/screenz/playing_now.dart';
+import 'package:music_player_djsaric/screens/playing_now.dart';
 import 'package:music_player_djsaric/state-provider/song_provider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
@@ -145,6 +145,7 @@ class _SongsState extends State<Songs> {
 
     // Only update the UI if the application has all required permissions.
     if (_hasPermission) {
+      //TODO: refresh na minut i streamovi
       _audioQuery
           .querySongs(
         sortType: null,

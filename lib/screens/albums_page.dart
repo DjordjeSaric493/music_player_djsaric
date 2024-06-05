@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:music_player_djsaric/screenz/album_songs_page.dart';
+import 'package:music_player_djsaric/screens/album_songs_page.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 //Stateful widget, showing albums (using streams for updating UI)
@@ -19,6 +19,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
 
   @override
   void initState() {
+    fetchALbums(); //Fetch albums TODO: Try to not forget next time
     super.initState();
   }
 

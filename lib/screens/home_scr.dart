@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:music_player_djsaric/screenz/albums_page.dart';
+import 'package:music_player_djsaric/screens/albums_page.dart';
 import 'album_songs_page.dart';
 import 'songs.dart';
 
