@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -19,39 +21,46 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
   Future<List<SongModel>>? songsQuery;
   final OnAudioQuery _audioQuery = OnAudioQuery();
   final AudioPlayer _audioPlayer = AudioPlayer();
-  late Future<List<SongModel>> _songsFuture;
+  final StreamController<List<SongModel>> _songsAlbumController =
+      StreamController<List<SongModel>>.broadcast();
+  Timer? _queryTimer;
 
   @override
   void initState() {
     super.initState();
-
-    _songsFuture = _fetchSongs();
+    startQueryingSongs();
     //Hold the future result of the songs that will be fetched from the specified album.
   }
 
-  Future<List<SongModel>> _fetchSongs() async {
-    // Request permission
+  void startQueryingSongs() {
+    _queryTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      querySongs();
+    });
+    querySongs(); // Initial query
+  }
+
+  Future<void> querySongs() async {
     bool permissionStatus = await _audioQuery.permissionsStatus();
     if (!permissionStatus) {
-      await _audioQuery
-          .permissionsRequest(); //if it doesn't have permissions it will ask for it
+      permissionStatus = await _audioQuery.permissionsRequest();
     }
-    // Fetch songs from the specified album
-    return await _audioQuery.queryAudiosFrom(
-      AudiosFromType.ALBUM_ID, //specified album
-      widget.albumId,
-      sortType: SongSortType.TITLE, // sort songs by title
-    );
+    if (permissionStatus) {
+      List<SongModel> songs = await _audioQuery.queryAudiosFrom(
+        AudiosFromType.ALBUM_ID,
+        widget.albumId,
+        sortType: SongSortType.TITLE,
+      );
+      _songsAlbumController.add(songs);
+    }
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //TODO: STAVI STREAM!!!!
         title: Text(widget.album.toString()),
       ),
-      body: FutureBuilder<List<SongModel>>(
-        future: _songsFuture,
+      body: StreamBuilder<List<SongModel>>(
+        stream: _songsAlbumController.stream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

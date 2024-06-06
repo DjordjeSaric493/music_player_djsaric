@@ -21,7 +21,7 @@ class _SongsState extends State<Songs> {
   bool _hasPermission = false;
   final OnAudioQuery _audioQuery = OnAudioQuery();
   final AudioPlayer _audioPlayer = AudioPlayer();
-  Timer? scanTimer;
+  Timer? queryTimer;
   // StreamController for songs
   final StreamController<List<SongModel>> _songsController =
       StreamController<List<SongModel>>.broadcast();
@@ -48,10 +48,9 @@ class _SongsState extends State<Songs> {
 
     // Check and request for permission.
     checkAndRequestPermissions();
-    startScan();
   }
 
-  void startScan() {
+  /*void startScan() {
     scanTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
       scanNewMusic();
     });
@@ -74,36 +73,7 @@ class _SongsState extends State<Songs> {
     }
   }
 
-  /* void scanDirectory(Directory directory) {
-    //TODO: DA VRAĆA LISTE PESAMA
-    try {
-      //this
-      List<FileSystemEntity> entities = directory.listSync(recursive: true);
-      List<SongModel> newSongs = [];
-      for (FileSystemEntity entity in entities) {
-        if (entity is File) {
-          if (_isMusicFile(entity.path)) {
-            // Query the song details and add to newSongs list
-            _audioQuery
-                .querySongs(
-              path: entity.path,
-              uriType: UriType.EXTERNAL,
-            )
-                .then((songs) {
-              if (songs.isNotEmpty) {
-                newSongs.addAll(songs);
-                // Add the new songs to the stream
-                _songsController.add(newSongs);
-              }
-            });
-          }
-        }
-      }
-    } catch (e) {
-      print('$e');
-    }
-  }*/
-  //try to return list of songs
+
 
   Future<List<SongModel>> scanDirectory(Directory directory) async {
     List<SongModel> newSongs = [];
@@ -135,22 +105,23 @@ class _SongsState extends State<Songs> {
     // if file ends with any of these its music file I guess
     const mediaExtensions = ['.mp3', '.wav', '.flac'];
     return mediaExtensions.any((extension) => path.endsWith(extension));
+  }*/
+
+  void startQueryingSongs() {
+    queryTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      querySongs();
+    });
+    querySongs(); // Initial query
   }
 
-  Future<void> checkAndRequestPermissions({bool retry = false}) async {
-    // The param 'retryRequest' is false, by default.
-    _hasPermission = await _audioQuery.checkAndRequest(
-      retryRequest: retry,
-    );
-
-    // Only update the UI if the application has all required permissions.
+  void querySongs() {
     if (_hasPermission) {
-      //TODO: refresh na minut i streamovi
       _audioQuery
           .querySongs(
         sortType: null,
         orderType: OrderType.ASC_OR_SMALLER,
-        uriType: UriType.EXTERNAL, // external storage to read from device mem
+        uriType:
+            UriType.EXTERNAL, // external storage to read from device memory
         ignoreCase: true,
       )
           .then((songs) {
@@ -161,10 +132,18 @@ class _SongsState extends State<Songs> {
     }
   }
 
+  Future<void> checkAndRequestPermissions({bool retry = false}) async {
+    _hasPermission = await _audioQuery.checkAndRequest(retryRequest: retry);
+
+    if (_hasPermission) {
+      startQueryingSongs();
+    }
+  }
+
   @override
   void dispose() {
     _songsController.close();
-    scanTimer?.cancel();
+    queryTimer?.cancel();
     super.dispose();
   }
 
