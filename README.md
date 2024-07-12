@@ -2,6 +2,7 @@
 
 **<span style="color: green;">WORK IN PROGRESS...</span>**
 better version is planned to be done in september
+
 done: figure out how to play audio
       reading audio files from device storage
       messing up with basic samsung-like UI 
